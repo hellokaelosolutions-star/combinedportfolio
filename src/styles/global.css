@@ -1,0 +1,132 @@
+/* ---------- Fonts (self-hosted, see public/fonts) ---------- */
+@font-face {
+  font-family: 'EB Garamond Var';
+  font-style: normal;
+  font-weight: 400 800;
+  font-display: swap;
+  src: url('/fonts/eb-garamond-variable.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'EB Garamond Var';
+  font-style: italic;
+  font-weight: 400;
+  font-display: swap;
+  src: url('/fonts/eb-garamond-italic.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'Manrope Var';
+  font-style: normal;
+  font-weight: 200 800;
+  font-display: swap;
+  src: url('/fonts/manrope-variable.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'Caveat';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url('/fonts/caveat-600.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'IBM Plex Mono';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url('/fonts/ibm-plex-mono-400.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'IBM Plex Mono';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url('/fonts/ibm-plex-mono-500.woff2') format('woff2');
+}
+
+/* ---------- Theme tokens ---------- */
+:root {
+  --paper: #F3F0E1;
+  --linen: #E9E2C8;
+  --ink: #1A1917;
+  --ink-soft: #2E2C27;
+  --slate: #6E6A5A;
+  --berry: #B23A87;
+  --berry-strong: #8F2E6D;
+  --moss: #57662C;
+  --moss-strong: #3F4A20;
+  --line: #D9D2B4;
+  --radius: 2px;
+
+  --font-display: 'EB Garamond Var', Georgia, serif;
+  --font-body: 'Manrope Var', ui-sans-serif, system-ui, sans-serif;
+  --font-script: 'Caveat', cursive;
+  --font-mono: 'IBM Plex Mono', ui-monospace, monospace;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) {
+    --paper: #16150F;
+    --linen: #201E14;
+    --ink: #F1EDDD;
+    --ink-soft: #D9D4C0;
+    --slate: #A69F87;
+    --berry: #E872C4;
+    --berry-strong: #F3A0D9;
+    --moss: #A8C158;
+    --moss-strong: #BFD988;
+    --line: #3A3624;
+  }
+}
+:root[data-theme='dark'] {
+  --paper: #16150F;
+  --linen: #201E14;
+  --ink: #F1EDDD;
+  --ink-soft: #D9D4C0;
+  --slate: #A69F87;
+  --berry: #E872C4;
+  --berry-strong: #F3A0D9;
+  --moss: #A8C158;
+  --moss-strong: #BFD988;
+  --line: #3A3624;
+}
+
+/* ---------- Base ---------- */
+*, *::before, *::after { box-sizing: border-box; }
+
+html { -webkit-text-size-adjust: 100%; scroll-behavior: smooth; }
+
+body {
+  margin: 0;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--font-body);
+  font-weight: 400;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+
+h1, h2, h3, h4 {
+  font-family: var(--font-display);
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  text-wrap: balance;
+  margin: 0;
+}
+
+a { color: inherit; }
+
+.masthead {
+  height: 6px;
+  background: linear-gradient(90deg, var(--berry) 0 50%, var(--moss) 50% 100%);
+}
+:focus-visible { outline: 2px solid var(--berry); outline-offset: 3px; }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+  html {
+    scroll-behavior: auto;
+  }
+}

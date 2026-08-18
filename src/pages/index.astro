@@ -1,17 +1,655 @@
 ---
+import Base from '../layouts/Base.astro';
+import SiteHeader from '../components/SiteHeader.astro';
+import { team, achievements, companies, projects } from '../data/team';
 
+const lais = team.find((p) => p.slug === 'lais')!;
+const hadi = team.find((p) => p.slug === 'hadi')!;
+
+function companyHeaderBg(people: { accent: 'berry' | 'moss' }[]) {
+	const accents = [...new Set(people.map((p) => p.accent))];
+	if (accents.length > 1) {
+		return `linear-gradient(90deg, var(--berry) 0 50%, var(--moss) 50% 100%)`;
+	}
+	return `var(--${accents[0]})`;
+}
 ---
 
-<html lang="en">
-	<head>
-		<meta charset="utf-8" />
-		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-		<link rel="icon" href="/favicon.ico" />
-		<meta name="viewport" content="width=device-width" />
-		<meta name="generator" content={Astro.generator} />
-		<title>Astro</title>
-	</head>
-	<body>
-		<h1>Astro</h1>
-	</body>
-</html>
+<Base
+	title="Kaelo Solutions — Lais & Hadi"
+	description="The work and people behind Kaelo Solutions."
+>
+	<SiteHeader
+		links={[
+			{ label: 'Team', href: '#team' },
+			{ label: 'Ventures', href: '#ventures' },
+			{ label: 'Achievements', href: '#achievements' },
+		]}
+	/>
+
+	<header class="hero" id="hero">
+		<div class="hero-text">
+			<p class="eyebrow">built by two</p>
+			<h1>Two hands,<br /><em>one page.</em></h1>
+			<p class="lede">
+				We build AI agents and digital solutions for businesses. This is where our work, roles,
+				and how to reach us live — for clients and collaborators alike.
+			</p>
+			<div class="tag-row">
+				<span class="tag-pill">AI Agents</span>
+				<span class="tag-pill">Automation</span>
+				<span class="tag-pill">Custom Software</span>
+				<span class="tag-pill">Web Apps</span>
+			</div>
+			<a class="cta-button" href="#team">Get in touch ↓</a>
+		</div>
+		<div class="hero-mark" aria-hidden="true">
+			<img class="orb orb-berry" src={lais.photo} alt="" width="148" height="148" />
+			<img class="orb orb-moss" src={hadi.photo} alt="" width="148" height="148" />
+		</div>
+	</header>
+
+	<section class="team" id="team" aria-label="Team">
+		<div class="team-seam" aria-hidden="true"></div>
+		{
+			team.map((person) => (
+				<article class="person">
+					<a class="person-head" href={`/${person.slug}`} style={`background: var(--${person.accent})`}>
+						<img class="avatar" src={person.photo} alt={person.name} width="52" height="52" />
+						<div>
+							<h2>{person.name}</h2>
+							<p class="role-title">{person.title}</p>
+						</div>
+					</a>
+
+					<div class="person-body">
+						<p class="bio">{person.bio}</p>
+
+						<div class="skills">
+							{person.skills.map((skill) => (
+								<span class="skill-pill">{skill}</span>
+							))}
+						</div>
+
+						<div class="primary-role" style={`border-color: var(--${person.accent})`}>
+							<span class="role-org">{person.primaryRole.org}</span>
+							<span class="role-period">{person.primaryRole.period}</span>
+							<h3>{person.primaryRole.title}</h3>
+							<p>{person.primaryRole.blurb}</p>
+						</div>
+
+						{person.secondaryRoles.length > 0 && (
+							<div class="secondary-roles">
+								{person.secondaryRoles.map((role) => (
+									<button type="button" class="sr-chip">
+										<span class="sr-org">{role.org}</span>
+										<span class="sr-title">{role.title}</span>
+										<span class="sr-period">{role.period}</span>
+										<span class="sr-blurb">{role.blurb}</span>
+									</button>
+								))}
+							</div>
+						)}
+
+						<div class="contact">
+							<a href={`mailto:${person.email}`}>{person.email}</a>
+							<a href={`tel:${person.phone.replace(/\s/g, '')}`}>{person.phone}</a>
+							<a href={person.linkedin} target="_blank" rel="noopener">LinkedIn ↗</a>
+							<a href={person.instagram} target="_blank" rel="noopener">Instagram ↗</a>
+						</div>
+					</div>
+				</article>
+			))
+		}
+	</section>
+
+	<section class="stack" id="ventures" aria-label="Ventures">
+		<div class="section-block">
+			<span class="section-block-bar" aria-hidden="true"></span>
+			<h2 class="section-block-title">Ventures</h2>
+		</div>
+		<div class="company-grid">
+			{
+				companies.map((c) => (
+					<article class="company-card">
+						<div class="company-head" style={`background: ${companyHeaderBg(c.people)}`}>
+							<div class="company-id">
+								<img class="company-logo" src={c.logo} alt={`${c.name} logo`} />
+								<h3>{c.name}</h3>
+							</div>
+							<span class="company-period">{c.period}</span>
+						</div>
+						<div class="company-body">
+							<p class="company-tagline">{c.tagline}</p>
+							<div class="company-people">
+								{c.people.map((p) => (
+									<span class="person-chip">
+										<span class="chip-dot" style={`background: var(--${p.accent})`} />
+										<span class="chip-name">{p.name}</span>
+										<span class="chip-role">{p.role}</span>
+									</span>
+								))}
+							</div>
+							<div class="contact">
+								<a href={c.linkedin} target="_blank" rel="noopener">LinkedIn ↗</a>
+								<a href={c.instagram} target="_blank" rel="noopener">Instagram ↗</a>
+							</div>
+						</div>
+					</article>
+				))
+			}
+		</div>
+	</section>
+
+	<section class="stack" aria-label="Projects">
+		<h2 class="stack-heading">Projects</h2>
+		{projects.length === 0 ? (
+			<div class="banner banner-empty">
+				<span class="banner-title">Projects</span>
+				<span class="banner-detail">Coming soon — the first client project lands here.</span>
+			</div>
+		) : (
+			projects.map((p) => (
+				<div class="banner banner-gradient">
+					<span class="banner-title">{p.title}</span>
+					<span class="banner-detail">{p.summary}</span>
+				</div>
+			))
+		)}
+	</section>
+
+	<section class="stack stack-final" id="achievements" aria-label="Achievements">
+		<h2 class="stack-heading">Achievements</h2>
+		{
+			achievements.map((a) => (
+				<div class="banner banner-gradient">
+					<span class="banner-title">{a.title}</span>
+					<span class="banner-detail">{a.detail}</span>
+				</div>
+			))
+		}
+	</section>
+
+	<div class="masthead" aria-hidden="true"></div>
+</Base>
+
+<style>
+	.hero {
+		max-width: 1080px;
+		margin: 0 auto;
+		padding: 88px 28px 64px;
+		display: grid;
+		grid-template-columns: 1.3fr 0.7fr;
+		gap: 40px;
+		align-items: center;
+		scroll-margin-top: 60px;
+	}
+	@media (max-width: 780px) {
+		.hero {
+			grid-template-columns: 1fr;
+		}
+	}
+	.eyebrow {
+		font-family: var(--font-mono);
+		font-size: 12px;
+		letter-spacing: 0.12em;
+		text-transform: uppercase;
+		color: var(--slate);
+		margin: 0 0 22px;
+	}
+	h1 {
+		font-size: clamp(44px, 7vw, 80px);
+		line-height: 1;
+		margin-bottom: 24px;
+	}
+	h1 em {
+		font-style: italic;
+		font-weight: 400;
+		color: var(--berry);
+	}
+	.lede {
+		font-size: 19px;
+		color: var(--ink-soft);
+		max-width: 46ch;
+		margin: 0;
+	}
+	.tag-row {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 8px;
+		margin-top: 24px;
+	}
+	.tag-pill {
+		font-family: var(--font-mono);
+		font-size: 11px;
+		letter-spacing: 0.04em;
+		text-transform: uppercase;
+		border: 1px solid var(--line);
+		padding: 6px 12px;
+		color: var(--ink-soft);
+	}
+	.cta-button {
+		display: inline-flex;
+		align-items: center;
+		gap: 6px;
+		margin-top: 28px;
+		background: var(--berry);
+		color: var(--paper);
+		font-family: var(--font-mono);
+		font-size: 13px;
+		letter-spacing: 0.04em;
+		text-transform: uppercase;
+		padding: 13px 24px;
+		text-decoration: none;
+		border: 1px solid var(--berry);
+		transition:
+			background 0.15s ease,
+			border-color 0.15s ease;
+	}
+	.cta-button:hover {
+		background: var(--moss);
+		border-color: var(--moss);
+	}
+
+	.hero-mark {
+		position: relative;
+		height: 220px;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+	}
+	.orb {
+		position: absolute;
+		width: 148px;
+		height: 148px;
+		border-radius: 50%;
+		object-fit: cover;
+		object-position: 50% 35%;
+		border: 4px solid var(--paper);
+	}
+	.orb-berry {
+		outline: 3px solid var(--berry);
+		left: calc(50% - 120px);
+		z-index: 1;
+	}
+	.orb-moss {
+		outline: 3px solid var(--moss);
+		left: calc(50% - 10px);
+		z-index: 2;
+	}
+
+	.team {
+		max-width: 1080px;
+		margin: 0 auto;
+		padding: 0 28px 56px;
+		display: grid;
+		grid-template-columns: 1fr 1fr;
+		gap: 28px;
+		position: relative;
+		scroll-margin-top: 60px;
+	}
+	@media (max-width: 780px) {
+		.team {
+			grid-template-columns: 1fr;
+		}
+		.team-seam {
+			display: none;
+		}
+	}
+	.team-seam {
+		position: absolute;
+		top: 0;
+		bottom: 0;
+		left: 50%;
+		width: 2px;
+		transform: translateX(-50%);
+		background: linear-gradient(180deg, var(--berry), var(--moss));
+		pointer-events: none;
+		z-index: 1;
+	}
+	.team-seam::after {
+		content: '';
+		position: absolute;
+		top: 50%;
+		left: 50%;
+		width: 12px;
+		height: 12px;
+		border-radius: 50%;
+		background: var(--paper);
+		border: 2px solid var(--line);
+		transform: translate(-50%, -50%);
+	}
+	.person {
+		background: var(--paper);
+		border: 1px solid var(--line);
+		display: flex;
+		flex-direction: column;
+	}
+
+	.person-head {
+		display: flex;
+		align-items: center;
+		gap: 16px;
+		padding: 24px 28px;
+		text-decoration: none;
+		transition: filter 0.15s ease;
+	}
+	.person-head:hover {
+		filter: brightness(1.08);
+	}
+	.avatar {
+		width: 52px;
+		height: 52px;
+		flex-shrink: 0;
+		border-radius: 50%;
+		border: 2px solid var(--paper);
+		object-fit: cover;
+		object-position: 50% 35%;
+		display: block;
+	}
+	.person-head h2 {
+		font-size: 23px;
+		color: var(--paper);
+		margin-bottom: 4px;
+	}
+	.role-title {
+		font-family: var(--font-mono);
+		font-size: 11px;
+		letter-spacing: 0.06em;
+		text-transform: uppercase;
+		color: var(--paper);
+		opacity: 0.85;
+		margin: 0;
+	}
+
+	.person-body {
+		padding: 28px;
+		display: flex;
+		flex-direction: column;
+		gap: 22px;
+	}
+	.bio {
+		font-size: 15px;
+		color: var(--ink-soft);
+		line-height: 1.6;
+		margin: 0;
+	}
+	.skills {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 6px;
+	}
+	.skill-pill {
+		font-family: var(--font-mono);
+		font-size: 10.5px;
+		letter-spacing: 0.03em;
+		text-transform: uppercase;
+		border: 1px solid var(--line);
+		padding: 4px 9px;
+		color: var(--slate);
+	}
+
+	.primary-role {
+		background: var(--linen);
+		border-left: 4px solid;
+		padding: 18px 20px;
+	}
+	.role-org {
+		font-family: var(--font-mono);
+		font-size: 11px;
+		text-transform: uppercase;
+		letter-spacing: 0.06em;
+		color: var(--slate);
+	}
+	.role-period {
+		font-family: var(--font-mono);
+		font-size: 11px;
+		color: var(--slate);
+		float: right;
+	}
+	.primary-role h3 {
+		font-size: 20px;
+		margin: 8px 0 8px;
+		clear: both;
+	}
+	.primary-role p {
+		font-size: 14px;
+		color: var(--ink-soft);
+		margin: 0;
+		line-height: 1.55;
+	}
+
+	.secondary-roles {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 8px;
+	}
+	.sr-chip {
+		display: flex;
+		flex-direction: column;
+		gap: 2px;
+		max-width: 240px;
+		border: 1px solid var(--line);
+		background: none;
+		padding: 8px 12px;
+		font-size: 12px;
+		font-family: inherit;
+		text-align: left;
+		cursor: pointer;
+	}
+	.sr-chip:hover,
+	.sr-chip:focus-visible {
+		border-color: var(--slate);
+	}
+	.sr-chip:focus-visible {
+		outline: 2px solid var(--berry);
+		outline-offset: 2px;
+	}
+	.sr-org {
+		font-weight: 700;
+		color: var(--ink-soft);
+	}
+	.sr-title {
+		color: var(--slate);
+	}
+	.sr-period {
+		font-family: var(--font-mono);
+		font-size: 10.5px;
+		color: var(--slate);
+	}
+	.sr-blurb {
+		display: block;
+		max-height: 0;
+		overflow: hidden;
+		opacity: 0;
+		font-size: 11px;
+		color: var(--ink-soft);
+		line-height: 1.45;
+		transition:
+			max-height 0.25s ease,
+			opacity 0.2s ease,
+			margin-top 0.25s ease;
+	}
+	.sr-chip:hover .sr-blurb,
+	.sr-chip:focus .sr-blurb {
+		max-height: 120px;
+		opacity: 1;
+		margin-top: 6px;
+	}
+
+	.contact {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 6px 16px;
+		font-family: var(--font-mono);
+		font-size: 12px;
+		margin-top: auto;
+		padding-top: 16px;
+		border-top: 1px solid var(--line);
+	}
+	.contact a {
+		color: var(--slate);
+		text-decoration: none;
+	}
+	.contact a:hover {
+		color: var(--ink);
+		text-decoration: underline;
+	}
+
+	.stack {
+		max-width: 1080px;
+		margin: 0 auto;
+		padding: 0 28px 40px;
+		display: flex;
+		flex-direction: column;
+		gap: 12px;
+		scroll-margin-top: 60px;
+	}
+	.stack-final {
+		padding-bottom: 72px;
+	}
+	.stack-heading {
+		font-family: var(--font-mono);
+		font-size: 12px;
+		letter-spacing: 0.1em;
+		text-transform: uppercase;
+		color: var(--slate);
+		margin: 0 0 6px;
+	}
+	.section-block {
+		display: flex;
+		align-items: center;
+		gap: 16px;
+		margin-bottom: 8px;
+	}
+	.section-block-bar {
+		width: 6px;
+		height: 34px;
+		flex-shrink: 0;
+		background: linear-gradient(180deg, var(--berry), var(--moss));
+	}
+	.section-block-title {
+		font-size: 30px;
+		margin: 0;
+	}
+	.company-grid {
+		display: grid;
+		grid-template-columns: 1fr 1fr;
+		gap: 20px;
+	}
+	@media (max-width: 780px) {
+		.company-grid {
+			grid-template-columns: 1fr;
+		}
+	}
+	.company-card {
+		border: 1px solid var(--line);
+		background: var(--paper);
+		display: flex;
+		flex-direction: column;
+	}
+	.company-head {
+		padding: 16px 24px;
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+		gap: 12px;
+	}
+	.company-id {
+		display: flex;
+		align-items: center;
+		gap: 14px;
+	}
+	.company-logo {
+		width: 44px;
+		height: 44px;
+		flex-shrink: 0;
+		background: #ffffff;
+		border-radius: var(--radius);
+		object-fit: contain;
+		padding: 6px;
+	}
+	.company-head h3 {
+		font-size: 22px;
+		color: var(--ink);
+		margin: 0;
+	}
+	.company-period {
+		font-family: var(--font-mono);
+		font-size: 11px;
+		color: var(--ink);
+		opacity: 0.75;
+		white-space: nowrap;
+	}
+	.company-body {
+		padding: 22px 24px;
+		display: flex;
+		flex-direction: column;
+		gap: 18px;
+	}
+	.company-tagline {
+		font-size: 14.5px;
+		color: var(--ink-soft);
+		line-height: 1.6;
+		margin: 0;
+	}
+	.company-people {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 8px;
+	}
+	.person-chip {
+		display: inline-flex;
+		align-items: center;
+		gap: 7px;
+		border: 1px solid var(--line);
+		padding: 6px 12px 6px 10px;
+		font-size: 12px;
+	}
+	.chip-dot {
+		width: 7px;
+		height: 7px;
+		border-radius: 50%;
+		flex-shrink: 0;
+	}
+	.chip-name {
+		font-weight: 700;
+		color: var(--ink-soft);
+	}
+	.chip-role {
+		color: var(--slate);
+	}
+	.chip-role::before {
+		content: '— ';
+	}
+
+	.banner {
+		padding: 28px 32px;
+		display: flex;
+		flex-wrap: wrap;
+		align-items: baseline;
+		gap: 6px 18px;
+	}
+	.banner-gradient {
+		background: linear-gradient(90deg, var(--berry), var(--moss));
+	}
+	.banner-empty {
+		background: none;
+		border: 1px dashed var(--line);
+	}
+	.banner-empty .banner-title,
+	.banner-empty .banner-detail {
+		color: var(--slate);
+	}
+	.banner-title {
+		font-family: var(--font-script);
+		font-weight: 600;
+		font-size: 32px;
+		color: var(--paper);
+	}
+	.banner-detail {
+		font-size: 14px;
+		color: var(--paper);
+		opacity: 0.9;
+	}
+</style>

@@ -1,0 +1,79 @@
+---
+import { team } from '../data/team';
+
+const lais = team.find((p) => p.slug === 'lais')!;
+const hadi = team.find((p) => p.slug === 'hadi')!;
+
+interface Props {
+	links: { label: string; href: string }[];
+}
+
+const { links } = Astro.props;
+---
+
+<div class="site-header">
+	<div class="masthead" aria-hidden="true"></div>
+	<nav class="site-nav">
+		<div class="site-nav-inner">
+			<a class="nav-brand" href="/">
+				<img class="nav-mark" src={lais.photo} alt="" width="22" height="22" />
+				<img class="nav-mark" src={hadi.photo} alt="" width="22" height="22" />
+			</a>
+			<div class="nav-links">
+				{links.map((l) => <a href={l.href}>{l.label}</a>)}
+			</div>
+		</div>
+	</nav>
+</div>
+
+<style>
+	.site-header {
+		position: sticky;
+		top: 0;
+		z-index: 40;
+	}
+	.site-nav {
+		background: var(--paper);
+		border-bottom: 1px solid var(--line);
+	}
+	.site-nav-inner {
+		max-width: 1080px;
+		margin: 0 auto;
+		padding: 12px 28px;
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+		gap: 16px;
+	}
+	.nav-brand {
+		display: flex;
+		align-items: center;
+		text-decoration: none;
+	}
+	.nav-mark {
+		width: 22px;
+		height: 22px;
+		border-radius: 50%;
+		object-fit: cover;
+		object-position: 50% 35%;
+		border: 1.5px solid var(--paper);
+	}
+	.nav-mark + .nav-mark {
+		margin-left: -8px;
+	}
+	.nav-links {
+		display: flex;
+		gap: 22px;
+	}
+	.nav-links a {
+		color: var(--slate);
+		text-decoration: none;
+		font-family: var(--font-mono);
+		font-size: 11px;
+		letter-spacing: 0.06em;
+		text-transform: uppercase;
+	}
+	.nav-links a:hover {
+		color: var(--berry);
+	}
+</style>

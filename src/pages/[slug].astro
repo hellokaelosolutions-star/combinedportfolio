@@ -1,0 +1,351 @@
+---
+import Base from '../layouts/Base.astro';
+import SiteHeader from '../components/SiteHeader.astro';
+import { team, companies } from '../data/team';
+
+export function getStaticPaths() {
+	return team.map((person) => ({
+		params: { slug: person.slug },
+		props: { person },
+	}));
+}
+
+const { person } = Astro.props;
+const other = team.find((p) => p.slug !== person.slug)!;
+const firstName = other.name.split(' ')[0];
+const myFirstName = person.name.split(' ')[0];
+const ventures = companies.filter((c) => c.people.some((p) => p.name === person.name));
+const allRoles = [person.primaryRole, ...person.secondaryRoles];
+---
+
+<Base title={`${person.name} — Portfolio`} description={person.bio}>
+	<SiteHeader
+		links={[
+			{ label: 'Home', href: '/' },
+			{ label: firstName, href: `/${other.slug}` },
+		]}
+	/>
+
+	<header class="p-hero" style={`--accent: var(--${person.accent})`}>
+		<img class="p-photo" src={person.photo} alt={person.name} width="220" height="220" />
+		<div class="p-hero-text">
+			<p class="eyebrow">portfolio</p>
+			<h1>{person.name}</h1>
+			<p class="p-role-line">{person.title}</p>
+			<p class="p-bio">{person.bio}</p>
+			<div class="skills">
+				{person.skills.map((skill) => <span class="skill-pill">{skill}</span>)}
+			</div>
+			<div class="contact">
+				<a href={`mailto:${person.email}`}>{person.email}</a>
+				<a href={`tel:${person.phone.replace(/\s/g, '')}`}>{person.phone}</a>
+				<a href={person.linkedin} target="_blank" rel="noopener">LinkedIn ↗</a>
+				<a href={person.instagram} target="_blank" rel="noopener">Instagram ↗</a>
+			</div>
+			<p class="p-signature">— {myFirstName}</p>
+		</div>
+	</header>
+
+	<section class="p-section" style={`--accent: var(--${person.accent})`}>
+		<div class="section-block">
+			<span class="section-block-bar" aria-hidden="true"></span>
+			<h2 class="section-block-title">Experience</h2>
+		</div>
+		<div class="p-roles">
+			{
+				allRoles.map((role, i) => (
+					<div class={`p-role ${i === 0 ? 'p-role-primary' : ''}`}>
+						<span class="role-org">{role.org}</span>
+						<span class="role-period">{role.period}</span>
+						<h3>{role.title}</h3>
+						<p>{role.blurb}</p>
+					</div>
+				))
+			}
+		</div>
+	</section>
+
+	{
+		ventures.length > 0 && (
+			<section class="p-section" style={`--accent: var(--${person.accent})`}>
+				<div class="section-block">
+					<span class="section-block-bar" aria-hidden="true" />
+					<h2 class="section-block-title">Ventures</h2>
+				</div>
+				<div class="company-grid">
+					{ventures.map((c) => (
+						<article class="company-card">
+							<div class="company-head">
+								<div class="company-id">
+									<img class="company-logo" src={c.logo} alt={`${c.name} logo`} />
+									<h3>{c.name}</h3>
+								</div>
+								<span class="company-period">{c.period}</span>
+							</div>
+							<div class="company-body">
+								<p class="company-tagline">{c.tagline}</p>
+								<div class="contact">
+									<a href={c.linkedin} target="_blank" rel="noopener">
+										LinkedIn ↗
+									</a>
+									<a href={c.instagram} target="_blank" rel="noopener">
+										Instagram ↗
+									</a>
+								</div>
+							</div>
+						</article>
+					))}
+				</div>
+			</section>
+		)
+	}
+
+	<footer class="p-footer">
+		<a class="p-back" href="/">← Back to the shared page</a>
+		<a class="p-sibling" href={`/${other.slug}`}>
+			See {firstName}'s page →
+		</a>
+	</footer>
+
+	<div class="masthead" aria-hidden="true"></div>
+</Base>
+
+<style>
+	.p-hero {
+		max-width: 1080px;
+		margin: 0 auto;
+		padding: 72px 28px 56px;
+		display: grid;
+		grid-template-columns: auto 1fr;
+		gap: 40px;
+		align-items: center;
+	}
+	@media (max-width: 700px) {
+		.p-hero {
+			grid-template-columns: 1fr;
+			text-align: center;
+			justify-items: center;
+		}
+	}
+	.p-photo {
+		width: 180px;
+		height: 180px;
+		border-radius: 50%;
+		object-fit: cover;
+		object-position: 50% 35%;
+		outline: 4px solid var(--accent);
+		outline-offset: 4px;
+	}
+	.eyebrow {
+		font-family: var(--font-mono);
+		font-size: 12px;
+		letter-spacing: 0.16em;
+		text-transform: uppercase;
+		color: var(--slate);
+		margin: 0 0 10px;
+	}
+	h1 {
+		font-size: clamp(36px, 5.5vw, 56px);
+		line-height: 1.02;
+		margin-bottom: 10px;
+	}
+	.p-role-line {
+		font-family: var(--font-mono);
+		font-size: 13px;
+		letter-spacing: 0.04em;
+		text-transform: uppercase;
+		color: var(--accent);
+		margin: 0 0 20px;
+	}
+	.p-bio {
+		font-size: 17px;
+		color: var(--ink-soft);
+		max-width: 60ch;
+		margin: 0 0 20px;
+		line-height: 1.6;
+	}
+	.skills {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 6px;
+		margin-bottom: 20px;
+	}
+	@media (max-width: 700px) {
+		.skills {
+			justify-content: center;
+		}
+	}
+	.skill-pill {
+		font-family: var(--font-mono);
+		font-size: 10.5px;
+		letter-spacing: 0.03em;
+		text-transform: uppercase;
+		border: 1px solid var(--line);
+		padding: 4px 9px;
+		color: var(--slate);
+	}
+	.contact {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 6px 16px;
+		font-family: var(--font-mono);
+		font-size: 12px;
+	}
+	.contact a {
+		color: var(--slate);
+		text-decoration: none;
+	}
+	.contact a:hover {
+		color: var(--accent);
+		text-decoration: underline;
+	}
+	.p-signature {
+		font-family: var(--font-script);
+		font-weight: 600;
+		font-size: 28px;
+		color: var(--accent);
+		margin: 22px 0 0;
+	}
+
+	.p-section {
+		max-width: 1080px;
+		margin: 0 auto;
+		padding: 0 28px 56px;
+	}
+	.section-block {
+		display: flex;
+		align-items: center;
+		gap: 16px;
+		margin-bottom: 24px;
+	}
+	.section-block-bar {
+		width: 6px;
+		height: 34px;
+		flex-shrink: 0;
+		background: var(--accent);
+	}
+	.section-block-title {
+		font-size: 30px;
+		margin: 0;
+	}
+
+	.p-roles {
+		display: flex;
+		flex-direction: column;
+		gap: 14px;
+	}
+	.p-role {
+		background: var(--linen);
+		border-left: 4px solid var(--line);
+		padding: 18px 22px;
+	}
+	.p-role-primary {
+		border-left-color: var(--accent);
+	}
+	.role-org {
+		font-family: var(--font-mono);
+		font-size: 11px;
+		text-transform: uppercase;
+		letter-spacing: 0.06em;
+		color: var(--slate);
+	}
+	.role-period {
+		font-family: var(--font-mono);
+		font-size: 11px;
+		color: var(--slate);
+		float: right;
+	}
+	.p-role h3 {
+		font-size: 19px;
+		margin: 8px 0 8px;
+		clear: both;
+	}
+	.p-role p {
+		font-size: 14px;
+		color: var(--ink-soft);
+		margin: 0;
+		line-height: 1.55;
+	}
+
+	.company-grid {
+		display: grid;
+		grid-template-columns: 1fr 1fr;
+		gap: 20px;
+	}
+	@media (max-width: 700px) {
+		.company-grid {
+			grid-template-columns: 1fr;
+		}
+	}
+	.company-card {
+		border: 1px solid var(--line);
+		background: var(--paper);
+		display: flex;
+		flex-direction: column;
+	}
+	.company-head {
+		padding: 16px 24px;
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+		gap: 12px;
+		background: var(--accent);
+	}
+	.company-id {
+		display: flex;
+		align-items: center;
+		gap: 14px;
+	}
+	.company-logo {
+		width: 40px;
+		height: 40px;
+		flex-shrink: 0;
+		background: #ffffff;
+		border-radius: var(--radius);
+		object-fit: contain;
+		padding: 6px;
+	}
+	.company-head h3 {
+		font-size: 20px;
+		color: var(--paper);
+		margin: 0;
+	}
+	.company-period {
+		font-family: var(--font-mono);
+		font-size: 11px;
+		color: var(--paper);
+		opacity: 0.8;
+		white-space: nowrap;
+	}
+	.company-body {
+		padding: 20px 24px;
+		display: flex;
+		flex-direction: column;
+		gap: 16px;
+	}
+	.company-tagline {
+		font-size: 14px;
+		color: var(--ink-soft);
+		line-height: 1.6;
+		margin: 0;
+	}
+
+	.p-footer {
+		max-width: 1080px;
+		margin: 0 auto;
+		padding: 32px 28px 72px;
+		display: flex;
+		justify-content: space-between;
+		flex-wrap: wrap;
+		gap: 12px;
+		font-family: var(--font-mono);
+		font-size: 13px;
+	}
+	.p-footer a {
+		text-decoration: none;
+		color: var(--slate);
+	}
+	.p-footer a:hover {
+		color: var(--accent);
+	}
+</style>
