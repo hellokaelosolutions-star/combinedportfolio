@@ -152,6 +152,43 @@ export const companies: Company[] = [
 export type Project = {
 	title: string;
 	summary: string;
+	status: 'in-progress' | 'complete';
+	tag?: string;
 };
 
-export const projects: Project[] = [];
+export const projects: Project[] = [
+	{
+		title: 'BuildTrack',
+		summary:
+			'Construction site management software built for civil engineers and contractors to track work and business.',
+		status: 'complete',
+	},
+	{
+		title: 'WattWatch',
+		summary: 'An IoT solution to monitor and manage energy consumption in homes and large buildings.',
+		status: 'complete',
+	},
+	{
+		title: 'College Store Tracking System',
+		summary: 'A tracking system built for a college store.',
+		status: 'complete',
+	},
+	{
+		title: 'Elo AI',
+		summary: 'Automation SaaS for businesses.',
+		status: 'complete',
+		tag: 'Kaelo Solutions',
+	},
+	{
+		title: 'The Human Organizer',
+		summary: 'A personal project to track money, important events, work, and duties.',
+		status: 'in-progress',
+		tag: 'Lais',
+	},
+	{
+		title: 'PeerPods',
+		summary: 'A career exploration platform for graduates.',
+		status: 'in-progress',
+		tag: 'Hadi',
+	},
+];

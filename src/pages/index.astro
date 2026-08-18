@@ -13,6 +13,12 @@ function companyHeaderBg(people: { accent: 'berry' | 'moss' }[]) {
 	}
 	return `var(--${accents[0]})`;
 }
+
+function tagAccent(tag?: string): 'berry' | 'moss' | null {
+	if (tag === 'Lais') return lais.accent;
+	if (tag === 'Hadi') return hadi.accent;
+	return null;
+}
 ---
 
 <Base
@@ -23,6 +29,7 @@ function companyHeaderBg(people: { accent: 'berry' | 'moss' }[]) {
 		links={[
 			{ label: 'Team', href: '#team' },
 			{ label: 'Ventures', href: '#ventures' },
+			{ label: 'Projects', href: '#projects' },
 			{ label: 'Achievements', href: '#achievements' },
 		]}
 	/>
@@ -141,20 +148,41 @@ function companyHeaderBg(people: { accent: 'berry' | 'moss' }[]) {
 		</div>
 	</section>
 
-	<section class="stack" aria-label="Projects">
-		<h2 class="stack-heading">Projects</h2>
+	<section class="stack" id="projects" aria-label="Projects">
+		<div class="section-block">
+			<span class="section-block-bar" aria-hidden="true"></span>
+			<h2 class="section-block-title">Projects</h2>
+		</div>
 		{projects.length === 0 ? (
 			<div class="banner banner-empty">
 				<span class="banner-title">Projects</span>
 				<span class="banner-detail">Coming soon — the first client project lands here.</span>
 			</div>
 		) : (
-			projects.map((p) => (
-				<div class="banner banner-gradient">
-					<span class="banner-title">{p.title}</span>
-					<span class="banner-detail">{p.summary}</span>
-				</div>
-			))
+			<div class="project-grid">
+				{projects.map((p) => {
+					const accent = tagAccent(p.tag);
+					return (
+						<article class="project-card">
+							<div class="project-card-top">
+								<h3>{p.title}</h3>
+								<span class={`status-pill ${p.status === 'in-progress' ? 'status-live' : ''}`}>
+									{p.status === 'in-progress' ? 'In progress' : 'Complete'}
+								</span>
+							</div>
+							<p class="project-summary">{p.summary}</p>
+							{p.tag && (
+								<span
+									class="project-tag"
+									style={accent ? `border-color:var(--${accent});color:var(--${accent})` : ''}
+								>
+									{p.tag}
+								</span>
+							)}
+						</article>
+					);
+				})}
+			</div>
 		)}
 	</section>
 
@@ -621,6 +649,61 @@ function companyHeaderBg(people: { accent: 'berry' | 'moss' }[]) {
 	}
 	.chip-role::before {
 		content: '— ';
+	}
+
+	.project-grid {
+		display: grid;
+		grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+		gap: 16px;
+	}
+	.project-card {
+		border: 1px solid var(--line);
+		background: var(--paper);
+		padding: 20px 22px;
+		display: flex;
+		flex-direction: column;
+		gap: 12px;
+	}
+	.project-card-top {
+		display: flex;
+		justify-content: space-between;
+		align-items: flex-start;
+		gap: 10px;
+	}
+	.project-card-top h3 {
+		font-size: 18px;
+		margin: 0;
+	}
+	.status-pill {
+		font-family: var(--font-mono);
+		font-size: 10px;
+		letter-spacing: 0.05em;
+		text-transform: uppercase;
+		padding: 3px 8px;
+		white-space: nowrap;
+		border: 1px solid var(--line);
+		color: var(--slate);
+	}
+	.status-live {
+		border-color: var(--moss);
+		color: var(--moss);
+	}
+	.project-summary {
+		font-size: 13.5px;
+		color: var(--ink-soft);
+		line-height: 1.55;
+		margin: 0;
+		flex-grow: 1;
+	}
+	.project-tag {
+		align-self: flex-start;
+		font-family: var(--font-mono);
+		font-size: 10px;
+		letter-spacing: 0.04em;
+		text-transform: uppercase;
+		padding: 3px 9px;
+		border: 1px solid var(--line);
+		color: var(--slate);
 	}
 
 	.banner {
