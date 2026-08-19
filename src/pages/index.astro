@@ -631,6 +631,7 @@ function tagAccent(tag?: string): 'berry' | 'moss' | null {
 	.company-head {
 		padding: 16px 24px;
 		display: flex;
+		flex-wrap: wrap;
 		justify-content: space-between;
 		align-items: center;
 		gap: 12px;
@@ -639,6 +640,7 @@ function tagAccent(tag?: string): 'berry' | 'moss' | null {
 		display: flex;
 		align-items: center;
 		gap: 14px;
+		min-width: 0;
 	}
 	.company-logo {
 		width: 44px;
@@ -705,7 +707,7 @@ function tagAccent(tag?: string): 'berry' | 'moss' | null {
 
 	.project-grid {
 		display: grid;
-		grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+		grid-template-columns: repeat(auto-fill, minmax(min(260px, 100%), 1fr));
 		gap: 16px;
 	}
 	.project-card {
@@ -780,7 +782,7 @@ function tagAccent(tag?: string): 'berry' | 'moss' | null {
 	}
 	.trophy-card {
 		position: relative;
-		width: 260px;
+		width: min(260px, 100%);
 		background: var(--paper);
 		border: 1px solid var(--line);
 		box-shadow: 0 10px 24px rgba(0, 0, 0, 0.18);

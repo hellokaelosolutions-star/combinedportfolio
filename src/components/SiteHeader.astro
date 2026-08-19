@@ -9,6 +9,7 @@ interface Props {
 }
 
 const { links } = Astro.props;
+const isCollapsible = links.length > 2;
 ---
 
 <div class="site-header">
@@ -19,8 +20,10 @@ const { links } = Astro.props;
 				<img class="nav-mark" src={lais.photo} alt="" width="22" height="22" />
 				<img class="nav-mark" src={hadi.photo} alt="" width="22" height="22" />
 			</a>
-			<div class="nav-links">
-				{links.map((l) => <a href={l.href}>{l.label}</a>)}
+			<div class={`nav-right ${isCollapsible ? 'is-collapsible' : ''}`}>
+				<div class="nav-links" id="nav-links">
+					{links.map((l) => <a href={l.href}>{l.label}</a>)}
+				</div>
 				<button type="button" class="theme-toggle" id="theme-toggle" aria-label="Toggle color theme">
 					<svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
 						<circle cx="12" cy="12" r="4" />
@@ -30,6 +33,25 @@ const { links } = Astro.props;
 						<path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
 					</svg>
 				</button>
+				{
+					isCollapsible && (
+						<button
+							type="button"
+							class="nav-toggle"
+							id="nav-toggle"
+							aria-label="Toggle menu"
+							aria-expanded="false"
+							aria-controls="nav-links"
+						>
+							<svg class="icon-burger" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+								<path d="M3 6h18M3 12h18M3 18h18" />
+							</svg>
+							<svg class="icon-close" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+								<path d="M5 5l14 14M19 5L5 19" />
+							</svg>
+						</button>
+					)
+				}
 			</div>
 		</div>
 	</nav>
@@ -46,6 +68,19 @@ const { links } = Astro.props;
 		root.setAttribute('data-theme', next);
 		localStorage.setItem('theme', next);
 	});
+
+	const navToggle = document.getElementById('nav-toggle');
+	const navLinks = document.getElementById('nav-links');
+	navToggle?.addEventListener('click', () => {
+		const open = navLinks?.classList.toggle('is-open');
+		navToggle.setAttribute('aria-expanded', open ? 'true' : 'false');
+	});
+	navLinks?.querySelectorAll('a').forEach((a) => {
+		a.addEventListener('click', () => {
+			navLinks.classList.remove('is-open');
+			navToggle?.setAttribute('aria-expanded', 'false');
+		});
+	});
 </script>
 
 <style>
@@ -59,6 +94,7 @@ const { links } = Astro.props;
 		border-bottom: 1px solid var(--line);
 	}
 	.site-nav-inner {
+		position: relative;
 		max-width: 1080px;
 		margin: 0 auto;
 		padding: 12px 28px;
@@ -83,9 +119,15 @@ const { links } = Astro.props;
 	.nav-mark + .nav-mark {
 		margin-left: -8px;
 	}
+	.nav-right {
+		display: flex;
+		align-items: center;
+		gap: 16px;
+	}
 	.nav-links {
 		display: flex;
 		gap: 22px;
+		flex-wrap: wrap;
 	}
 	.nav-links a {
 		color: var(--slate);
@@ -97,6 +139,35 @@ const { links } = Astro.props;
 	}
 	.nav-links a:hover {
 		color: var(--berry);
+	}
+	.nav-toggle {
+		display: none;
+		align-items: center;
+		justify-content: center;
+		width: 26px;
+		height: 26px;
+		border: 1px solid var(--line);
+		background: none;
+		color: var(--slate);
+		cursor: pointer;
+		padding: 0;
+	}
+	.nav-toggle:hover {
+		color: var(--berry);
+		border-color: var(--slate);
+	}
+	.nav-toggle svg {
+		width: 15px;
+		height: 15px;
+	}
+	.nav-toggle .icon-close {
+		display: none;
+	}
+	.nav-toggle[aria-expanded='true'] .icon-burger {
+		display: none;
+	}
+	.nav-toggle[aria-expanded='true'] .icon-close {
+		display: block;
 	}
 	.theme-toggle {
 		display: inline-flex;
@@ -133,6 +204,39 @@ const { links } = Astro.props;
 		}
 		:global(html:not([data-theme='light'])) .theme-toggle .icon-moon {
 			display: block;
+		}
+	}
+
+	@media (max-width: 700px) {
+		.site-nav-inner {
+			padding: 12px 20px;
+		}
+		.nav-right.is-collapsible .nav-toggle {
+			display: inline-flex;
+		}
+		.nav-right.is-collapsible .nav-links {
+			display: none;
+			position: absolute;
+			top: 100%;
+			left: 0;
+			right: 0;
+			flex-direction: column;
+			gap: 4px;
+			background: var(--paper);
+			border-bottom: 1px solid var(--line);
+			padding: 8px 20px 16px;
+			box-shadow: 0 12px 20px rgba(0, 0, 0, 0.12);
+		}
+		.nav-right.is-collapsible .nav-links.is-open {
+			display: flex;
+		}
+		.nav-right.is-collapsible .nav-links a {
+			padding: 10px 0;
+			font-size: 13px;
+			border-bottom: 1px solid var(--line);
+		}
+		.nav-right.is-collapsible .nav-links a:last-child {
+			border-bottom: none;
 		}
 	}
 </style>
