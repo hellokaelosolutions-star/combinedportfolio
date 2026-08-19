@@ -1,0 +1,118 @@
+---
+import '../styles/global.css';
+import { team } from '../data/team';
+
+const lais = team.find((p) => p.slug === 'lais')!;
+const hadi = team.find((p) => p.slug === 'hadi')!;
+---
+
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+	</head>
+	<body>
+		<div class="canvas">
+			<div class="bar" aria-hidden="true"></div>
+			<div class="content">
+				<p class="eyebrow">kaelo solutions — built by two</p>
+				<h1>Two hands,<br /><em>one page.</em></h1>
+				<p class="footer">lais &amp; hadi — shared portfolio</p>
+			</div>
+			<div class="mark" aria-hidden="true">
+				<img class="orb orb-berry" src={lais.photo} width="220" height="220" alt="" />
+				<img class="orb orb-moss" src={hadi.photo} width="220" height="220" alt="" />
+			</div>
+		</div>
+	</body>
+</html>
+
+<style>
+	:global(html),
+	:global(body) {
+		margin: 0;
+		padding: 0;
+	}
+	.canvas {
+		width: 1200px;
+		height: 630px;
+		position: relative;
+		background: #16150f;
+		overflow: hidden;
+	}
+	.bar {
+		position: absolute;
+		top: 0;
+		left: 0;
+		right: 0;
+		height: 10px;
+		background: linear-gradient(90deg, #e872c4 0 50%, #a8c158 50% 100%);
+	}
+	.content {
+		position: absolute;
+		left: 80px;
+		top: 0;
+		bottom: 0;
+		display: flex;
+		flex-direction: column;
+		justify-content: center;
+		max-width: 640px;
+	}
+	.eyebrow {
+		font-family: var(--font-mono);
+		font-size: 18px;
+		letter-spacing: 0.14em;
+		text-transform: uppercase;
+		color: #a69f87;
+		margin: 0 0 28px;
+	}
+	h1 {
+		font-family: var(--font-display);
+		font-weight: 600;
+		font-size: 84px;
+		line-height: 1.02;
+		color: #f1eddd;
+		margin: 0 0 36px;
+	}
+	h1 em {
+		font-style: italic;
+		font-weight: 400;
+		color: #e872c4;
+	}
+	.footer {
+		font-family: var(--font-mono);
+		font-size: 16px;
+		letter-spacing: 0.06em;
+		text-transform: uppercase;
+		color: #a8c158;
+		margin: 0;
+	}
+	.mark {
+		position: absolute;
+		right: 90px;
+		top: 0;
+		bottom: 0;
+		width: 340px;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+	}
+	.orb {
+		position: absolute;
+		width: 220px;
+		height: 220px;
+		border-radius: 50%;
+		object-fit: cover;
+		object-position: 50% 35%;
+		border: 6px solid #16150f;
+	}
+	.orb-berry {
+		outline: 5px solid #e872c4;
+		left: 0;
+		z-index: 1;
+	}
+	.orb-moss {
+		outline: 5px solid #a8c158;
+		left: 150px;
+		z-index: 2;
+	}
+</style>

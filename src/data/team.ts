@@ -97,10 +97,29 @@ export const team: Person[] = [
 	},
 ];
 
-export const achievements = [
+export type Achievement = {
+	placement: string;
+	event: string;
+	detail: string;
+};
+
+export const achievements: Achievement[] = [
 	{
-		title: 'Hackathon win',
-		detail: 'Details coming soon — placed together at a state-level hackathon.',
+		placement: '2nd Place',
+		event: 'ENVI 8',
+		detail:
+			"Hackathon, National Technical Fest — St. Joseph's College (Autonomous), Devagiri, Calicut — as Team Algora",
+	},
+	{
+		placement: '3rd Place',
+		event: 'TECHBLAZE 3.0',
+		detail: 'Hackathon, state-level inter-college tech fest — JDT Islam Polytechnic College',
+	},
+	{
+		placement: '2nd Place',
+		event: 'Tarang',
+		detail:
+			'Project Competition, National Level Techno-Cultural Fest — Government Polytechnic College, Kannur',
 	},
 ];
 
@@ -118,6 +137,7 @@ export type Company = {
 	people: CompanyPerson[];
 	linkedin: string;
 	instagram: string;
+	website?: string;
 };
 
 export const companies: Company[] = [
@@ -133,6 +153,7 @@ export const companies: Company[] = [
 		],
 		linkedin: 'https://www.linkedin.com/company/kaelosolutions-india',
 		instagram: 'https://www.instagram.com/kaelosolutions/',
+		website: 'https://www.kaelosolutions.com',
 	},
 	{
 		name: 'Kodox Technologies',
@@ -154,6 +175,7 @@ export type Project = {
 	summary: string;
 	status: 'in-progress' | 'complete';
 	tag?: string;
+	categories: string[];
 };
 
 export const projects: Project[] = [
@@ -162,33 +184,39 @@ export const projects: Project[] = [
 		summary:
 			'Construction site management software built for civil engineers and contractors to track work and business.',
 		status: 'complete',
+		categories: ['Construction', 'Management Software'],
 	},
 	{
 		title: 'WattWatch',
 		summary: 'An IoT solution to monitor and manage energy consumption in homes and large buildings.',
 		status: 'complete',
+		categories: ['IoT', 'Energy'],
 	},
 	{
 		title: 'College Store Tracking System',
 		summary: 'A tracking system built for a college store.',
 		status: 'complete',
+		categories: ['Inventory Tracking'],
 	},
 	{
 		title: 'Elo AI',
 		summary: 'Automation SaaS for businesses.',
 		status: 'complete',
 		tag: 'Kaelo Solutions',
+		categories: ['SaaS', 'Automation'],
 	},
 	{
 		title: 'The Human Organizer',
 		summary: 'A personal project to track money, important events, work, and duties.',
 		status: 'in-progress',
 		tag: 'Lais',
+		categories: ['Productivity', 'Personal Finance'],
 	},
 	{
 		title: 'PeerPods',
 		summary: 'A career exploration platform for graduates.',
 		status: 'in-progress',
 		tag: 'Hadi',
+		categories: ['Career Platform', 'EdTech'],
 	},
 ];

@@ -14,6 +14,10 @@ function companyHeaderBg(people: { accent: 'berry' | 'moss' }[]) {
 	return `var(--${accents[0]})`;
 }
 
+function waLink(phone: string) {
+	return `https://wa.me/${phone.replace(/\D/g, '')}`;
+}
+
 function tagAccent(tag?: string): 'berry' | 'moss' | null {
 	if (tag === 'Lais') return lais.accent;
 	if (tag === 'Hadi') return hadi.accent;
@@ -31,6 +35,7 @@ function tagAccent(tag?: string): 'berry' | 'moss' | null {
 			{ label: 'Ventures', href: '#ventures' },
 			{ label: 'Projects', href: '#projects' },
 			{ label: 'Achievements', href: '#achievements' },
+			{ label: 'Contact', href: '#contact' },
 		]}
 	/>
 
@@ -60,7 +65,7 @@ function tagAccent(tag?: string): 'berry' | 'moss' | null {
 		<div class="team-seam" aria-hidden="true"></div>
 		{
 			team.map((person) => (
-				<article class="person">
+				<article class="person reveal">
 					<a class="person-head" href={`/${person.slug}`} style={`background: var(--${person.accent})`}>
 						<img class="avatar" src={person.photo} alt={person.name} width="52" height="52" />
 						<div>
@@ -118,7 +123,7 @@ function tagAccent(tag?: string): 'berry' | 'moss' | null {
 		<div class="company-grid">
 			{
 				companies.map((c) => (
-					<article class="company-card">
+					<article class="company-card reveal">
 						<div class="company-head" style={`background: ${companyHeaderBg(c.people)}`}>
 							<div class="company-id">
 								<img class="company-logo" src={c.logo} alt={`${c.name} logo`} />
@@ -138,6 +143,11 @@ function tagAccent(tag?: string): 'berry' | 'moss' | null {
 								))}
 							</div>
 							<div class="contact">
+								{c.website && (
+									<a href={c.website} target="_blank" rel="noopener">
+										Website ↗
+									</a>
+								)}
 								<a href={c.linkedin} target="_blank" rel="noopener">LinkedIn ↗</a>
 								<a href={c.instagram} target="_blank" rel="noopener">Instagram ↗</a>
 							</div>
@@ -163,7 +173,7 @@ function tagAccent(tag?: string): 'berry' | 'moss' | null {
 				{projects.map((p) => {
 					const accent = tagAccent(p.tag);
 					return (
-						<article class="project-card">
+						<article class="project-card reveal">
 							<div class="project-card-top">
 								<h3>{p.title}</h3>
 								<span class={`status-pill ${p.status === 'in-progress' ? 'status-live' : ''}`}>
@@ -171,14 +181,19 @@ function tagAccent(tag?: string): 'berry' | 'moss' | null {
 								</span>
 							</div>
 							<p class="project-summary">{p.summary}</p>
-							{p.tag && (
-								<span
-									class="project-tag"
-									style={accent ? `border-color:var(--${accent});color:var(--${accent})` : ''}
-								>
-									{p.tag}
-								</span>
-							)}
+							<div class="project-tags">
+								{p.categories.map((c) => (
+									<span class="category-tag">{c}</span>
+								))}
+								{p.tag && (
+									<span
+										class="project-tag"
+										style={accent ? `border-color:var(--${accent});color:var(--${accent})` : ''}
+									>
+										{p.tag}
+									</span>
+								)}
+							</div>
 						</article>
 					);
 				})}
@@ -186,16 +201,53 @@ function tagAccent(tag?: string): 'berry' | 'moss' | null {
 		)}
 	</section>
 
-	<section class="stack stack-final" id="achievements" aria-label="Achievements">
-		<h2 class="stack-heading">Achievements</h2>
-		{
-			achievements.map((a) => (
-				<div class="banner banner-gradient">
-					<span class="banner-title">{a.title}</span>
-					<span class="banner-detail">{a.detail}</span>
-				</div>
-			))
-		}
+	<section class="stack" id="achievements" aria-label="Achievements">
+		<div class="section-block">
+			<span class="section-block-bar" aria-hidden="true"></span>
+			<h2 class="section-block-title">Achievements</h2>
+		</div>
+		<div class="trophy-stack">
+			{
+				achievements.map((a) => (
+					<div class="trophy-card reveal-fade">
+						<span class="trophy-top-bar" aria-hidden="true" />
+						<p class="trophy-placement">{a.placement}</p>
+						<h3 class="trophy-event">{a.event}</h3>
+						<p class="trophy-detail">{a.detail}</p>
+					</div>
+				))
+			}
+		</div>
+	</section>
+
+	<section class="closing reveal" id="contact">
+		<p class="eyebrow">say hello</p>
+		<h2>
+			Let's build<br /><em>something.</em>
+		</h2>
+		<p class="lede closing-lede">
+			Have a project in mind, or just want to talk shop? Reach either of us directly.
+		</p>
+		<div class="closing-ctas">
+			<a
+				class="contact-btn"
+				style="--accent: var(--berry)"
+				href={waLink(lais.phone)}
+				target="_blank"
+				rel="noopener"
+			>
+				WhatsApp {lais.name.split(' ')[0]} →
+			</a>
+			<a
+				class="contact-btn"
+				style="--accent: var(--moss)"
+				href={waLink(hadi.phone)}
+				target="_blank"
+				rel="noopener"
+			>
+				WhatsApp {hadi.name.split(' ')[0]} →
+			</a>
+		</div>
 	</section>
 
 	<div class="masthead" aria-hidden="true"></div>
@@ -695,8 +747,12 @@ function tagAccent(tag?: string): 'berry' | 'moss' | null {
 		margin: 0;
 		flex-grow: 1;
 	}
-	.project-tag {
-		align-self: flex-start;
+	.project-tags {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 6px;
+	}
+	.category-tag {
 		font-family: var(--font-mono);
 		font-size: 10px;
 		letter-spacing: 0.04em;
@@ -704,6 +760,99 @@ function tagAccent(tag?: string): 'berry' | 'moss' | null {
 		padding: 3px 9px;
 		border: 1px solid var(--line);
 		color: var(--slate);
+		background: var(--linen);
+	}
+	.project-tag {
+		font-family: var(--font-mono);
+		font-size: 10px;
+		letter-spacing: 0.04em;
+		text-transform: uppercase;
+		padding: 3px 9px;
+		border: 1px solid var(--line);
+		color: var(--slate);
+	}
+
+	.trophy-stack {
+		display: flex;
+		flex-wrap: wrap;
+		justify-content: center;
+		padding: 28px 0 20px;
+	}
+	.trophy-card {
+		position: relative;
+		width: 260px;
+		background: var(--paper);
+		border: 1px solid var(--line);
+		box-shadow: 0 10px 24px rgba(0, 0, 0, 0.18);
+		padding: 30px 26px 26px;
+		margin-left: -34px;
+		transition:
+			transform 0.2s ease,
+			box-shadow 0.2s ease;
+	}
+	.trophy-card:first-child {
+		margin-left: 0;
+	}
+	.trophy-card:nth-child(odd) {
+		transform: rotate(-3deg);
+	}
+	.trophy-card:nth-child(even) {
+		transform: rotate(2.5deg);
+		z-index: 1;
+	}
+	.trophy-card:hover {
+		transform: rotate(0deg) translateY(-8px);
+		box-shadow: 0 16px 30px rgba(0, 0, 0, 0.24);
+		z-index: 5;
+	}
+	.trophy-top-bar {
+		position: absolute;
+		top: 0;
+		left: 0;
+		right: 0;
+		height: 4px;
+	}
+	.trophy-card:nth-child(odd) .trophy-top-bar {
+		background: var(--berry);
+	}
+	.trophy-card:nth-child(even) .trophy-top-bar {
+		background: var(--moss);
+	}
+	.trophy-placement {
+		font-family: var(--font-script);
+		font-weight: 600;
+		font-size: 32px;
+		margin: 0 0 4px;
+	}
+	.trophy-card:nth-child(odd) .trophy-placement {
+		color: var(--berry);
+	}
+	.trophy-card:nth-child(even) .trophy-placement {
+		color: var(--moss);
+	}
+	.trophy-event {
+		font-size: 18px;
+		margin: 0 0 10px;
+	}
+	.trophy-detail {
+		font-family: var(--font-mono);
+		font-size: 11.5px;
+		color: var(--slate);
+		line-height: 1.55;
+		margin: 0;
+	}
+	@media (max-width: 700px) {
+		.trophy-stack {
+			flex-direction: column;
+			align-items: center;
+			gap: 20px;
+		}
+		.trophy-card,
+		.trophy-card:nth-child(odd),
+		.trophy-card:nth-child(even) {
+			margin-left: 0;
+			transform: none;
+		}
 	}
 
 	.banner {
@@ -735,4 +884,172 @@ function tagAccent(tag?: string): 'berry' | 'moss' | null {
 		color: var(--paper);
 		opacity: 0.9;
 	}
+
+	.closing {
+		max-width: 720px;
+		margin: 0 auto;
+		padding: 64px 28px 88px;
+		text-align: center;
+		scroll-margin-top: 60px;
+	}
+	.closing .eyebrow {
+		margin: 0 0 22px;
+	}
+	.closing h2 {
+		font-size: clamp(36px, 6vw, 64px);
+		line-height: 1.04;
+		margin-bottom: 22px;
+	}
+	.closing h2 em {
+		font-style: italic;
+		font-weight: 400;
+		color: var(--moss);
+	}
+	.closing-lede {
+		margin: 0 auto 32px;
+	}
+	.closing-ctas {
+		display: flex;
+		justify-content: center;
+		flex-wrap: wrap;
+		gap: 14px;
+	}
+	.contact-btn {
+		display: inline-flex;
+		align-items: center;
+		gap: 8px;
+		padding: 13px 24px;
+		font-family: var(--font-mono);
+		font-size: 13px;
+		letter-spacing: 0.04em;
+		text-transform: uppercase;
+		text-decoration: none;
+		border: 1px solid var(--accent);
+		color: var(--accent);
+		transition:
+			background 0.15s ease,
+			color 0.15s ease;
+	}
+	.contact-btn:hover {
+		background: var(--accent);
+		color: var(--paper);
+	}
+
+	.orb {
+		transition: transform 0.3s ease;
+	}
+
+	.reveal {
+		opacity: 0;
+		transform: translateY(18px);
+		transition:
+			opacity 0.6s ease,
+			transform 0.6s ease;
+	}
+	.reveal.is-visible {
+		opacity: 1;
+		transform: translateY(0);
+	}
+	.reveal-fade {
+		opacity: 0;
+		transition: opacity 0.6s ease;
+	}
+	.reveal-fade.is-visible {
+		opacity: 1;
+	}
+	@media (prefers-reduced-motion: reduce) {
+		.reveal,
+		.reveal-fade {
+			opacity: 1;
+			transform: none;
+			transition: none;
+		}
+	}
+
+	.confetti-piece {
+		position: absolute;
+		width: 6px;
+		height: 6px;
+		pointer-events: none;
+		animation: confetti-burst 0.7s ease-out forwards;
+		z-index: 20;
+	}
+	@keyframes confetti-burst {
+		0% {
+			transform: translate(0, 0) rotate(0deg);
+			opacity: 1;
+		}
+		100% {
+			transform: translate(var(--dx), var(--dy)) rotate(var(--rot));
+			opacity: 0;
+		}
+	}
 </style>
+
+<script>
+	// Cursor-reactive hero orbs
+	const heroMark = document.querySelector<HTMLElement>('.hero-mark');
+	const orbs = document.querySelectorAll<HTMLElement>('.hero-mark .orb');
+	const reduceMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+	if (heroMark && orbs.length && !reduceMotion) {
+		heroMark.addEventListener('mousemove', (e) => {
+			const rect = heroMark.getBoundingClientRect();
+			const x = (e.clientX - rect.left) / rect.width - 0.5;
+			const y = (e.clientY - rect.top) / rect.height - 0.5;
+			orbs.forEach((orb, i) => {
+				const strength = i === 0 ? 10 : 16;
+				orb.style.transform = `translate(${x * strength}px, ${y * strength}px)`;
+			});
+		});
+		heroMark.addEventListener('mouseleave', () => {
+			orbs.forEach((orb) => {
+				orb.style.transform = '';
+			});
+		});
+	}
+
+	// Scroll-reveal
+	const revealEls = document.querySelectorAll('.reveal, .reveal-fade');
+	if (reduceMotion) {
+		revealEls.forEach((el) => el.classList.add('is-visible'));
+	} else if ('IntersectionObserver' in window) {
+		const observer = new IntersectionObserver(
+			(entries) => {
+				for (const entry of entries) {
+					if (entry.isIntersecting) {
+						entry.target.classList.add('is-visible');
+						observer.unobserve(entry.target);
+					}
+				}
+			},
+			{ threshold: 0.15, rootMargin: '0px 0px -40px 0px' }
+		);
+		revealEls.forEach((el) => observer.observe(el));
+	} else {
+		revealEls.forEach((el) => el.classList.add('is-visible'));
+	}
+
+	// Trophy card hover confetti
+	if (!reduceMotion) {
+		const confettiColors = ['var(--berry)', 'var(--moss)', 'var(--slate)'];
+		document.querySelectorAll<HTMLElement>('.trophy-card').forEach((card) => {
+			card.addEventListener('mouseenter', () => {
+				for (let i = 0; i < 12; i++) {
+					const piece = document.createElement('span');
+					piece.className = 'confetti-piece';
+					const angle = Math.random() * Math.PI * 2;
+					const dist = 36 + Math.random() * 36;
+					piece.style.setProperty('--dx', `${Math.cos(angle) * dist}px`);
+					piece.style.setProperty('--dy', `${Math.sin(angle) * dist - 18}px`);
+					piece.style.setProperty('--rot', `${(Math.random() - 0.5) * 360}deg`);
+					piece.style.background = confettiColors[i % confettiColors.length];
+					piece.style.left = `${20 + Math.random() * 60}%`;
+					piece.style.top = `${15 + Math.random() * 25}%`;
+					card.appendChild(piece);
+					piece.addEventListener('animationend', () => piece.remove());
+				}
+			});
+		});
+	}
+</script>

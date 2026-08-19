@@ -21,10 +21,32 @@ const { links } = Astro.props;
 			</a>
 			<div class="nav-links">
 				{links.map((l) => <a href={l.href}>{l.label}</a>)}
+				<button type="button" class="theme-toggle" id="theme-toggle" aria-label="Toggle color theme">
+					<svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+						<circle cx="12" cy="12" r="4" />
+						<path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41" />
+					</svg>
+					<svg class="icon-moon" viewBox="0 0 24 24" fill="currentColor">
+						<path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
+					</svg>
+				</button>
 			</div>
 		</div>
 	</nav>
 </div>
+
+<script>
+	const btn = document.getElementById('theme-toggle');
+	btn?.addEventListener('click', () => {
+		const root = document.documentElement;
+		const current =
+			root.getAttribute('data-theme') ||
+			(matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+		const next = current === 'dark' ? 'light' : 'dark';
+		root.setAttribute('data-theme', next);
+		localStorage.setItem('theme', next);
+	});
+</script>
 
 <style>
 	.site-header {
@@ -75,5 +97,42 @@ const { links } = Astro.props;
 	}
 	.nav-links a:hover {
 		color: var(--berry);
+	}
+	.theme-toggle {
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		width: 26px;
+		height: 26px;
+		border: 1px solid var(--line);
+		background: none;
+		color: var(--slate);
+		cursor: pointer;
+		padding: 0;
+	}
+	.theme-toggle:hover {
+		color: var(--berry);
+		border-color: var(--slate);
+	}
+	.theme-toggle svg {
+		width: 14px;
+		height: 14px;
+	}
+	.icon-moon {
+		display: none;
+	}
+	:global(html[data-theme='dark']) .theme-toggle .icon-sun {
+		display: none;
+	}
+	:global(html[data-theme='dark']) .theme-toggle .icon-moon {
+		display: block;
+	}
+	@media (prefers-color-scheme: dark) {
+		:global(html:not([data-theme='light'])) .theme-toggle .icon-sun {
+			display: none;
+		}
+		:global(html:not([data-theme='light'])) .theme-toggle .icon-moon {
+			display: block;
+		}
 	}
 </style>

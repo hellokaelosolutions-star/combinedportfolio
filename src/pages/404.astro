@@ -1,0 +1,326 @@
+---
+import Base from '../layouts/Base.astro';
+import SiteHeader from '../components/SiteHeader.astro';
+---
+
+<Base title="Page not found — Kaelo Solutions" description="This page doesn't exist, but this game does.">
+	<SiteHeader links={[{ label: 'Home', href: '/' }]} />
+
+	<header class="hero">
+		<p class="eyebrow">you found the empty room</p>
+		<h1>This page doesn't exist.<br /><em>This game does.</em></h1>
+		<p class="lede">
+			While you're here — catch what falls. Move with your mouse, finger, or the arrow keys.
+		</p>
+	</header>
+
+	<section class="game-section">
+		<div class="game-frame">
+			<canvas id="game" width="640" height="400" aria-label="Catch game"></canvas>
+			<div class="game-hud">
+				<span id="score">Score: 0</span>
+				<span id="lives">●●●</span>
+			</div>
+			<div class="game-overlay" id="overlay">
+				<p class="overlay-title">Catch the falls</p>
+				<p class="overlay-sub">Miss three and it's over.</p>
+				<button type="button" class="overlay-btn" id="start-btn">Play</button>
+			</div>
+		</div>
+		<a class="home-link" href="/">← Back to the real page</a>
+	</section>
+
+	<div class="masthead" aria-hidden="true"></div>
+</Base>
+
+<style>
+	.hero {
+		max-width: 720px;
+		margin: 0 auto;
+		padding: 72px 28px 40px;
+		text-align: center;
+	}
+	.eyebrow {
+		font-family: var(--font-mono);
+		font-size: 12px;
+		letter-spacing: 0.12em;
+		text-transform: uppercase;
+		color: var(--slate);
+		margin: 0 0 22px;
+	}
+	h1 {
+		font-size: clamp(32px, 5.5vw, 52px);
+		line-height: 1.06;
+		margin-bottom: 18px;
+	}
+	h1 em {
+		font-style: italic;
+		font-weight: 400;
+		color: var(--berry);
+	}
+	.lede {
+		font-size: 17px;
+		color: var(--ink-soft);
+		max-width: 50ch;
+		margin: 0 auto;
+	}
+
+	.game-section {
+		max-width: 720px;
+		margin: 0 auto;
+		padding: 0 28px 96px;
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		gap: 24px;
+	}
+	.game-frame {
+		position: relative;
+		width: 100%;
+		max-width: 640px;
+		border: 1px solid var(--line);
+		background: var(--linen);
+	}
+	#game {
+		display: block;
+		width: 100%;
+		height: auto;
+		aspect-ratio: 640 / 400;
+		touch-action: none;
+	}
+	.game-hud {
+		position: absolute;
+		top: 12px;
+		left: 16px;
+		right: 16px;
+		display: flex;
+		justify-content: space-between;
+		font-family: var(--font-mono);
+		font-size: 13px;
+		color: var(--ink-soft);
+		pointer-events: none;
+	}
+	#lives {
+		color: var(--berry);
+		letter-spacing: 2px;
+	}
+	.game-overlay {
+		position: absolute;
+		inset: 0;
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		justify-content: center;
+		gap: 12px;
+		background: color-mix(in srgb, var(--paper) 88%, transparent);
+		text-align: center;
+	}
+	.game-overlay[hidden] {
+		display: none;
+	}
+	.overlay-title {
+		font-family: var(--font-display);
+		font-weight: 600;
+		font-size: 26px;
+		margin: 0;
+	}
+	.overlay-sub {
+		font-size: 14px;
+		color: var(--slate);
+		margin: 0 0 6px;
+	}
+	.overlay-btn {
+		font-family: var(--font-mono);
+		font-size: 13px;
+		letter-spacing: 0.04em;
+		text-transform: uppercase;
+		padding: 12px 28px;
+		background: var(--berry);
+		color: var(--paper);
+		border: 1px solid var(--berry);
+		cursor: pointer;
+		transition: background 0.15s ease;
+	}
+	.overlay-btn:hover {
+		background: var(--moss);
+		border-color: var(--moss);
+	}
+	.home-link {
+		font-family: var(--font-mono);
+		font-size: 13px;
+		color: var(--slate);
+		text-decoration: none;
+	}
+	.home-link:hover {
+		color: var(--berry);
+	}
+</style>
+
+<script>
+	const canvas = document.getElementById('game') as HTMLCanvasElement;
+	const ctx = canvas.getContext('2d')!;
+	const scoreEl = document.getElementById('score')!;
+	const livesEl = document.getElementById('lives')!;
+	const overlay = document.getElementById('overlay')!;
+	const overlayTitle = overlay.querySelector('.overlay-title')!;
+	const overlaySub = overlay.querySelector('.overlay-sub')!;
+	const startBtn = document.getElementById('start-btn')!;
+
+	const W = canvas.width;
+	const H = canvas.height;
+
+	function cssVar(name: string) {
+		return getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+	}
+	const colors = {
+		paper: cssVar('--paper'),
+		ink: cssVar('--ink'),
+		berry: cssVar('--berry'),
+		moss: cssVar('--moss'),
+		line: cssVar('--line'),
+	};
+
+	type Drop = { x: number; y: number; r: number; speed: number; color: string };
+
+	let paddleX = W / 2;
+	const paddleW = 90;
+	const paddleH = 14;
+	const paddleY = H - 34;
+
+	let drops: Drop[] = [];
+	let score = 0;
+	let misses = 0;
+	const maxMisses = 3;
+	let spawnEvery = 900;
+	let lastSpawn = 0;
+	let running = false;
+	let rafId = 0;
+
+	function resetGame() {
+		drops = [];
+		score = 0;
+		misses = 0;
+		spawnEvery = 900;
+		lastSpawn = 0;
+		scoreEl.textContent = 'Score: 0';
+		livesEl.textContent = '●●●';
+	}
+
+	function spawnDrop() {
+		const r = 8 + Math.random() * 5;
+		const color = Math.random() < 0.5 ? colors.berry : colors.moss;
+		drops.push({ x: r + Math.random() * (W - r * 2), y: -r, r, speed: 2.4 + Math.random() * 1.8, color });
+	}
+
+	function draw() {
+		ctx.fillStyle = colors.paper;
+		ctx.fillRect(0, 0, W, H);
+
+		ctx.strokeStyle = colors.line;
+		ctx.lineWidth = 1;
+		ctx.beginPath();
+		ctx.moveTo(0, paddleY + paddleH + 8);
+		ctx.lineTo(W, paddleY + paddleH + 8);
+		ctx.stroke();
+
+		for (const d of drops) {
+			ctx.beginPath();
+			ctx.arc(d.x, d.y, d.r, 0, Math.PI * 2);
+			ctx.fillStyle = d.color;
+			ctx.fill();
+		}
+
+		const half = paddleW / 2;
+		ctx.fillStyle = colors.berry;
+		ctx.fillRect(paddleX - half, paddleY, half, paddleH);
+		ctx.fillStyle = colors.moss;
+		ctx.fillRect(paddleX, paddleY, half, paddleH);
+	}
+
+	function update(dt: number, t: number) {
+		if (t - lastSpawn > spawnEvery) {
+			spawnDrop();
+			lastSpawn = t;
+			spawnEvery = Math.max(380, spawnEvery - 12);
+		}
+
+		for (let i = drops.length - 1; i >= 0; i--) {
+			const d = drops[i];
+			d.y += d.speed * (dt / 16.67);
+
+			const half = paddleW / 2;
+			if (
+				d.y + d.r >= paddleY &&
+				d.y - d.r <= paddleY + paddleH &&
+				d.x >= paddleX - half - d.r &&
+				d.x <= paddleX + half + d.r
+			) {
+				drops.splice(i, 1);
+				score++;
+				scoreEl.textContent = `Score: ${score}`;
+				continue;
+			}
+
+			if (d.y - d.r > H) {
+				drops.splice(i, 1);
+				misses++;
+				livesEl.textContent = '●'.repeat(Math.max(0, maxMisses - misses)) + '○'.repeat(misses);
+				if (misses >= maxMisses) {
+					endGame();
+					return;
+				}
+			}
+		}
+	}
+
+	let lastTime = 0;
+	function loop(t: number) {
+		if (!running) return;
+		const dt = lastTime ? t - lastTime : 16.67;
+		lastTime = t;
+		update(dt, t);
+		draw();
+		rafId = requestAnimationFrame(loop);
+	}
+
+	function startGame() {
+		resetGame();
+		running = true;
+		lastTime = 0;
+		overlay.hidden = true;
+		rafId = requestAnimationFrame(loop);
+	}
+
+	function endGame() {
+		running = false;
+		cancelAnimationFrame(rafId);
+		overlayTitle.textContent = 'Game over';
+		overlaySub.textContent = `You caught ${score}.`;
+		startBtn.textContent = 'Play again';
+		overlay.hidden = false;
+	}
+
+	startBtn.addEventListener('click', startGame);
+
+	function setPaddleFromClientX(clientX: number) {
+		const rect = canvas.getBoundingClientRect();
+		const scale = W / rect.width;
+		paddleX = Math.min(W - paddleW / 2, Math.max(paddleW / 2, (clientX - rect.left) * scale));
+	}
+
+	canvas.addEventListener('mousemove', (e) => setPaddleFromClientX(e.clientX));
+	canvas.addEventListener(
+		'touchmove',
+		(e) => {
+			if (e.touches[0]) setPaddleFromClientX(e.touches[0].clientX);
+			e.preventDefault();
+		},
+		{ passive: false }
+	);
+	window.addEventListener('keydown', (e) => {
+		if (e.key === 'ArrowLeft') paddleX = Math.max(paddleW / 2, paddleX - 24);
+		if (e.key === 'ArrowRight') paddleX = Math.min(W - paddleW / 2, paddleX + 24);
+	});
+
+	draw();
+</script>
